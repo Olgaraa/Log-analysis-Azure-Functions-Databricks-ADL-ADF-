@@ -39,8 +39,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     pattern = re.compile("<a.href.*log.*</a>."+str(date_now)+".*K")
     match=re.findall(pattern,soup)
     match=str(match)
-    pattern2=re.compile("[a-z]*.log.....-..-...gz")
+    print(match)
+    pattern2=re.compile("[a-z]*access.log.....-..-...gz")
     match2=re.findall(pattern2,match)
+    print(match2)
     #removing duplicates
     match2=list(dict.fromkeys(match2))
     #removing the ".gz"
@@ -49,7 +51,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     filename_position=0
     for url in match2:
         with gzip.open(urlopen("https://www.secrepo.com/self.logs/"+url), 'rb') as f_in:
-            with open(file_name[i], 'wb'):
+            with open(file_name[filename_position], 'wb'):
                 data=f_in.read()
                 write_file_to_adls(
                 datalake_service_client = adls_service_client,
