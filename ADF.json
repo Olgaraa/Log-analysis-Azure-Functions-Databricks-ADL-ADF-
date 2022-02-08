@@ -1,0 +1,86 @@
+{
+	"name": "Project3",
+	"properties": {
+		"activities": [
+			{
+				"name": "my_func",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"functionName": "my_func",
+					"method": "GET"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureFunction2",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "my_notebook",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "my_func",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/olgaraa@gmail.com/Project3"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Send_e-mail",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "my_notebook",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": "logicapp_url",
+					"method": "POST",
+					"body": {
+						"value": "{\n\"title\":\"ADF pipeline run output\",\n\"message\":\"@{activity('my_notebook').output.runOutput}\"\n}",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2022-02-08T11:09:01Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
